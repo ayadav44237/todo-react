@@ -143,3 +143,15 @@ body{
   display: flex;
   gap: 10px;
 }
+
+.editIcon path{
+  fill: rgb(135, 135, 212)
+}
+
+.deleteIcon path {
+  fill: red
+}
+
+.completedIcon path {
+  fill: green
+}

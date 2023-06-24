@@ -182,16 +182,19 @@ function App() {
                     <FontAwesomeIcon
                       icon={faCircleCheck}
                       onClick={() => markDone(task.id)}
+                      className="completedIcon"
                     />
                     <FontAwesomeIcon
                       icon={faPen}
                       onClick={() => editTask(task)}
+                      className="editIcon"
                     />
                   </>
                 )}
                 <FontAwesomeIcon
                   icon={faTrashCan}
                   onClick={() => deleteTask(task.id)}
+                  className="deleteIcon"
                 />
               </div>
             </div>
