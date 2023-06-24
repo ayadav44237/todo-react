@@ -1,181 +1,199 @@
-import  React , {useState} from 'react';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { faCircleCheck,faPen,faTrashCan} from '@fortawesome/free-solid-svg-icons'
+import {
+  faCircleCheck,
+  faPen,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 
-import './App.css'
+import "./App.css";
 
 function App() {
-  
-   // Task State
-   const[toDo,setToDo]=useState([]);
-   //Task State
-   const[title,setTitle]=useState('');
-   const[description,setDescription]=useState('');
-   const[updateData,setUpdateData]=useState('');
+  const initialTodos = JSON.parse(localStorage.getItem("todo"));
+  const [todo, settodo] = useState(initialTodos || []);
+  const [task, setTask] = useState({
+    title: "",
+    description: "",
+  });
 
-   //Add task
-   const addTask=()=>{
-        if(title) {
-          let num=toDo.length + 1;
-          let newEntry={ id: num, title: title, description: description, status:false }
-          setToDo([...toDo,newEntry])
-          setTitle('');
-        }
-   }
+  const [editTaskId, setEditTaskId] = useState(null);
 
-   //Delete Task
-   const deleteTask=(id)=>{
-    let newTasks=toDo.filter(task=>task.id!==id)
-    setToDo(newTasks);
-   }
-   //Mark task as done or completed
-   const markDone=(id)=>{
-    let title = toDo.map( task=>{
-      if(task.id === id){
-      return ({...task, status: !task.status})
-      }
-      return task;
-    })
-    setToDo(title);
-   }
-    //Cancel update
-   const CancelUpdate=()=>{
-    setUpdateData('');
-    
-   }
-   //change task for update
-   const changeTask=(e)=>{
-      let newEntry={
-        id: updateData.id,
-        [e.target.name]: e.target.value,
-        
-        status:updateData.status ? true: false
-      }
-      setUpdateData(newEntry);
-   }
-   //Update task
-   
-   const updateTask=()=>{
-        let filterRecords=[...toDo].filter(task=>task.id !== updateData.id);
-        let updatedObject=[...filterRecords, updateData]
-        setToDo(updatedObject);
-        setUpdateData('');
-   }
+  const addTask = () => {
+    if (task.title) {
+      let num = todo.length + 1;
+      let newEntry = {
+        id: num,
+        status: false,
+        ...task,
+      };
+
+      const newTodo = [newEntry, ...todo];
+      localStorage.setItem("todo", JSON.stringify(newTodo));
+      settodo(newTodo);
+      setTask({
+        title: "",
+        description: "",
+      });
+    }
+  };
+
+  const markDone = (id) => {
+    // fetch the task to mark done
+    const task = todo.find((task) => task.id === id);
+    // already completed task then return
+    if (task.status) return;
+    task.status = true;
+
+    const filteredTodo = todo.filter((task) => task.id !== id);
+
+    const firstCompletedTaskIndex = filteredTodo.findIndex((task) => task.status);
+    // now add this task at this index in newTodo
+    if(firstCompletedTaskIndex === -1) {
+      const newTodo = [...filteredTodo, task];
+      localStorage.setItem("todo", JSON.stringify(newTodo));
+      settodo(newTodo);
+      return;
+    }
+
+    const newTodo = [
+      ...filteredTodo.slice(0, firstCompletedTaskIndex),
+      task,
+      ...filteredTodo.slice(firstCompletedTaskIndex),
+    ];
+
+    // delete this task and add the task in the end of the array
+    localStorage.setItem("todo", JSON.stringify(newTodo));
+    settodo(newTodo);
+  };
+
+  const deleteTask = (id) => {
+    const newTodo = [...todo.filter((task) => task.id !== id)];
+    localStorage.setItem("todo", JSON.stringify(newTodo));
+    settodo(newTodo);
+  };
+
+  const onChangeTask = (e) => {
+    setTask({ ...task, [e.target.name]: e.target.value });
+  };
+
+  const editTask = (task) => {
+    setEditTaskId(task.id);
+    setTask({
+      title: task.title,
+      description: task.description,
+    });
+  };
+
+  const cancelEditTask = () => {
+    setEditTaskId(null);
+    setTask({
+      title: "",
+      description: "",
+    });
+  };
+
+  const saveEditTask = () => {
+    const taskIndex = todo.findIndex((task) => task.id === editTaskId);
+    const newTodo = [...todo];
+    newTodo[taskIndex] = {
+      ...newTodo[taskIndex],
+      ...task,
+    };
+    localStorage.setItem("todo", JSON.stringify(newTodo));
+    settodo(newTodo);
+    setTask({
+      title: "",
+      description: "",
+    });
+    setEditTaskId(null);
+  };
 
   return (
-    
-    <div className="container App">
-     <br /><br />
-     <h2>To Do List(ReactJs)</h2>
-     <br /><br />
-     {/*Update Task*/}
+    <div className="todoApp">
+      <h2 className="appTitle">Todo App</h2>
 
-     {updateData && updateData ? (
-       <>
-
-<div className="row">
-      <div className="col">
-        <input 
-        value={updateData && updateData.title }
-        onChange={(e)=> changeTask(e)}
-        className="form-control form-control-ig"
-        />
-      </div>
-      <div className="col-auto">
-        <button 
-          onClick={updateTask}
-         className="btn btn-lg btn-success mr-20"
-         >Update</button>
-         <button
-         onClick={CancelUpdate}
-          className="btn btn-lg btn-warning"
-          >Cancel</button>
-      </div>
-     </div>
-     <br/>
-       
-       </>
-     ):(
-     
-         <>
-          {/*Add TAsk*/}
-      <div className="row">
-        <div className="col">
-          <input 
-          value={title}
-          onChange={(e)=>setTitle(e.target.value)}
-          className="form-control form-control-ig"
+      <div className="createTaskForm">
+        <div className="taskDetailsInput">
+          <input
+            value={task.title}
+            onChange={onChangeTask}
+            name="title"
+            className="input"
+            placeholder="Add Title"
+          />
+          <input
+            value={task.description}
+            onChange={onChangeTask}
+            name="description"
+            className="input"
+            placeholder="Add Description"
           />
         </div>
-        <div className="col-auto">
-          <button
-          onClick={addTask}
-          className="btn btn-lg btn-success"
-          >Add Task </button>
-        </div>
+        {!editTaskId && (
+          <button onClick={addTask} className="button primary" type="button">
+            Add Task{" "}
+          </button>
+        )}
+
+        {editTaskId && (
+          <div className="buttons">
+            <button
+              onClick={saveEditTask}
+              className="button primary"
+              type="button"
+            >
+              Save
+            </button>
+            <button
+              onClick={cancelEditTask}
+              className="button secondary"
+              type="button"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
-      <br />
-          </>
-   
-     )
-     }
-     
 
-
-     
-
-
-
-
-     {/*Display Todos*/}
-     {toDo && toDo.length ? '':'Currently No  Tasks...'}
-
-      {toDo && toDo
-      .sort((a,b)=>a.id > b.id ? 1:-1)
-      .map( (task,index) => {
-        return(
-          <React.Fragment key={task.id}>
-
-           <div className="Col taskBg">
-             <div className={task.status ? 'done' : ''}>
-                 <span className="taskNumber">{index + 1}</span>
-                 <span className="taskText">{task.title}</span>
-             </div>
-             <div className="iconsWrap">
-              <span title="Completed/ Not Completed"
-              onClick={(e)=> markDone(task.id)}
-              >
-                <FontAwesomeIcon icon={faCircleCheck} />
-              </span>
-              {task.status ? null : (
-                  <span title="Edit"
-                  onClick={()=>setUpdateData({
-                  id: task.id,
-                  title: task.title,
-                  status: task.status ? true : false
-                }) }
-                  >
-                  <FontAwesomeIcon icon={faPen} />
-                  </span>
-              )}
-            
-              <span title="Delete" 
-              onClick={()=>deleteTask(task.id)}
-
-              >
-              <FontAwesomeIcon icon={faTrashCan} />
-              </span>
-             </div>
-           </div>
-           
-        </React.Fragment>
-        )
-      })
-      }
+      <div className="tasks">
+        {todo.map((task) => {
+          return (
+            <div
+              key={task.id}
+              className={`task ${task.status ? "done" : "active"}`}
+            >
+              <div className={`taskInfo`} onClick={() => markDone(task.id)}>
+                <span className="taskNumber">{task.id}</span>
+                <div className="taskDetails">
+                  <h1 className="taskTitle">{task.title}</h1>
+                  <p className="taskDescription">{task.description}</p>
+                </div>
+              </div>
+              <div className="icons">
+                {!task.status && (
+                  <>
+                    <FontAwesomeIcon
+                      icon={faCircleCheck}
+                      onClick={() => markDone(task.id)}
+                    />
+                    <FontAwesomeIcon
+                      icon={faPen}
+                      onClick={() => editTask(task)}
+                    />
+                  </>
+                )}
+                <FontAwesomeIcon
+                  icon={faTrashCan}
+                  onClick={() => deleteTask(task.id)}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
