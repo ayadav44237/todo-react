@@ -121,10 +121,16 @@ function App() {
             name="title"
             className="input"
             placeholder="Add Title"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") addTask();
+            }}
           />
           <input
             value={task.description}
             onChange={onChangeTask}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") addTask();
+            }}
             name="description"
             className="input"
             placeholder="Add Description"
