@@ -1,13 +1,13 @@
 # todo-react
-What the project does?###<br>
+### What the project does?<br>
 The Project is basically a ToDo app where u can ADD DELETE and UPDATE the tasks on daily basis.
 <br>
 <br>
-Technologies Used###<br>
+### Technologies Used<br>
 It ie very Easy to use and single page app made with the help of HTML CSS JavaScript and modern React features.<br>
 Used icons line Pen_check ,trash_bin and edit option to make it look good.<br>
 <br>
-Features###
+### Features<br>
 Most recent one should apper at first.<br>
 Completed Tasks Would be arranged to the bottem of the Tasks items.<br>
 Different CSS features has been added to make it look professional<br>
