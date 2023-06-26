@@ -15,8 +15,8 @@ Different CSS features has been added to make it look professional<br>
 <br>
 <br>
 
-## See Deployed Version <br>
- [See Deployed Version](https://todo-react-alpha-five.vercel.app/)<br>
+
+ ## [See Deployed Version](https://todo-react-alpha-five.vercel.app/) <br>
 
 ### Working Video<br>
 https://github.com/ayadav44237/todo-react/assets/79020880/c85bd7c8-4d9e-481d-abd3-8f5cf1d281be
